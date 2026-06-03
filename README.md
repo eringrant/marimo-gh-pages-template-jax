@@ -7,6 +7,7 @@ This template repository demonstrates how to export [marimo](https://marimo.io) 
 - `apps/charts.py`: Interactive data visualization with Altair
 - `notebooks/fibonacci.py`: Interactive Fibonacci sequence calculator
 - `notebooks/penguins.py`: Interactive data analysis with Polars and marimo
+- `static/jax_grad.py`: **JAX** autodiff, run at build time and served as static HTML
 
 ## 🚀 Usage
 

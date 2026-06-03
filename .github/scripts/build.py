@@ -212,6 +212,19 @@ def main(
     # Export apps from the apps/ directory
     apps_data = _export(Path("apps"), output_dir, as_app=True)
 
+    # Static notebooks: run at build time with `marimo export html` (not
+    # html-wasm) and bake outputs into static HTML, so they can use libraries
+    # with no Pyodide wheel, e.g., JAX. The result is a non-interactive snapshot.
+    #
+    # TODO: once jaxlib ships a Pyodide wheel, move these notebooks back to
+    # notebooks/ or apps/ for interactive in-browser execution and drop this
+    # build-time path. Tracking: https://github.com/pyodide/pyodide-recipes/issues/187
+    for nb in sorted(Path("static").glob("*.py")):
+        out_file = output_dir / nb.with_suffix(".html")
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["uvx", "marimo", "export", "html", "--sandbox", str(nb), "-o", str(out_file)], check=True)
+        apps_data.append({"display_name": nb.stem.replace("_", " ").title(), "html_path": str(nb.with_suffix(".html"))})
+
     # Exit if no notebooks or apps were found
     if not notebooks_data and not apps_data:
         logger.warning("No notebooks or apps found!")
